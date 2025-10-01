@@ -1,0 +1,98 @@
+package com.aerodream.artwork_service.Service;
+
+import com.aerodream.artwork_service.Dto.Comment.CommentCreateDto;
+import com.aerodream.artwork_service.Dto.Comment.CommentResponseDto;
+import com.aerodream.artwork_service.Dto.Comment.CommentUpdateBodyDto;
+import com.aerodream.artwork_service.Dto.Comment.CommentUpdateDto;
+import com.aerodream.artwork_service.Entity.ArtworkEntity;
+import com.aerodream.artwork_service.Entity.CommentEntity;
+import com.aerodream.artwork_service.Exception.ArtworkNotFoundException;
+import com.aerodream.artwork_service.Exception.CommentNotFoundException;
+import com.aerodream.artwork_service.Repository.ArtworkRepository;
+import com.aerodream.artwork_service.Repository.CommentRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.file.AccessDeniedException;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+public class CommentService {
+
+    private final ModelMapper modelMapper;
+    private final CommentRepository commentRepository;
+    private final ArtworkRepository artworkRepository;
+
+    public CommentResponseDto writeComment(CommentCreateDto createDto) throws ArtworkNotFoundException {
+        log.info("User with ID: {} writing comment to artwork with ID: {}", createDto.getUserId(), createDto.getArtworkId());
+
+        CommentEntity comment = modelMapper.map(createDto, CommentEntity.class);
+
+        ArtworkEntity artwork = artworkRepository.findById(createDto.getArtworkId())
+                .orElseThrow(() -> new ArtworkNotFoundException("Artwork not found with ID: " + createDto.getArtworkId()));
+
+        comment.setArtwork(artwork);
+        artwork.addComment(comment);
+
+        CommentEntity savedComment = commentRepository.save(comment);
+
+        log.info("User with ID: {} wrote comment with ID: {}", savedComment.getUserId(), savedComment.getId());
+        return convertEntityToResponseDto(savedComment);
+    }
+
+    @Transactional(rollbackFor = {CommentNotFoundException.class, AccessDeniedException.class})
+    public CommentResponseDto updateCommentBody(CommentUpdateBodyDto updateBodyDto, Long userId) throws CommentNotFoundException, AccessDeniedException {
+        log.info("User with ID: {} edits comment with ID : {}", userId, updateBodyDto.getId());
+
+        CommentEntity comment = commentRepository.findById(updateBodyDto.getId())
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + updateBodyDto.getId()));
+
+        if (!comment.getUserId().equals(userId))
+            throw new AccessDeniedException("You can change only yours comments");
+
+        modelMapper.map(updateBodyDto, comment);
+
+        log.info("User with ID: {} edited comment with ID: {}", userId, updateBodyDto.getId());
+        return convertEntityToResponseDto(comment);
+    }
+
+    @Transactional(rollbackFor = {CommentNotFoundException.class, AccessDeniedException.class})
+    public CommentResponseDto updateComment(CommentUpdateDto updateDto, Long creatorId) throws CommentNotFoundException, AccessDeniedException {
+        log.info("Creator with ID: {} updating comment with ID: {}", creatorId, updateDto.getId());
+
+        CommentEntity comment = commentRepository.findById(updateDto.getId())
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + updateDto.getId()));
+
+        ArtworkEntity artwork = comment.getArtwork();
+
+        if (!artwork.getCreatorId().equals(creatorId))
+            throw new AccessDeniedException("You can update comment only if you author of artwork");
+
+        artwork.removeComment(comment);
+        modelMapper.map(updateDto, comment);
+        artwork.addComment(comment);
+
+        log.info("Creator with ID: {} updated comment with ID: {}", creatorId, updateDto.getId());
+        return convertEntityToResponseDto(comment);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDto> getCommentsOfArtwork(Pageable pageable, Long artworkId) {
+        log.info("Fetching comments to artwork with ID: {}", artworkId);
+
+        Page<CommentEntity> comments = commentRepository.findByArtworkId(artworkId, pageable);
+
+        return comments.map(this::convertEntityToResponseDto);
+    }
+
+    private CommentResponseDto convertEntityToResponseDto(CommentEntity entity) {
+        return modelMapper.map(entity, CommentResponseDto.class);
+    }
+}

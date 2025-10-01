@@ -1,0 +1,29 @@
+package com.aerodream.artwork_service.Dto.Collection;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CollectionUpdateDto {
+
+    private String title;
+
+    private String description;
+
+    LocalDateTime updatedAt = LocalDateTime.now();
+
+    public boolean hasTitle() {
+        return title != null;
+    }
+
+    public boolean hasDescription() {
+        return description != null;
+    }
+}
