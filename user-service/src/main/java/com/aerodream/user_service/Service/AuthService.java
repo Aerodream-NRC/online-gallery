@@ -1,7 +1,7 @@
 package com.aerodream.user_service.Service;
 
 import com.aerodream.user_service.Config.JwtTokenProvider;
-import com.aerodream.user_service.Dto.User.JwtResponse;
+import com.aerodream.user_service.Dto.Jwt.JwtResponse;
 import com.aerodream.user_service.Dto.User.UserCreateDto;
 import com.aerodream.user_service.Dto.User.UserLoginDto;
 import com.aerodream.user_service.Entity.UserEntity;
