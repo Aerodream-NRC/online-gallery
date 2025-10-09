@@ -49,12 +49,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserResponseDto userAuthentication(UserLoginDto loginDto) {
-
-        return ;
-    }
-
-    @Transactional(readOnly = true)
     public UserResponseDto getUser(Long id) throws UserNotFoundException {
         log.info("Fetching user with ID: {}", id);
 
