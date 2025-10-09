@@ -35,6 +35,8 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    private String username;
+
     @Column(name = "avatar_url")
     private String avatarUrl;
 
