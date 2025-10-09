@@ -6,11 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -31,6 +35,12 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "is_enabled")
+    private Boolean isEnabled = true;
+
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private CreatorEntity creator;
@@ -48,12 +58,39 @@ public class UserEntity {
 
     private Set<Long> savedArtworksId = new HashSet<>();
 
-    @ManyToMany(mappedBy = "subscribers")
+    @ManyToMany(
+            mappedBy = "subscribers",
+            fetch = FetchType.LAZY
+    )
     private Set<CreatorEntity> subscriptions = new HashSet<>();
 
     public boolean isCreator() {
         return this.creator != null &&
                 this.roles.contains(RoleEnum.ROLE_CREATOR);
+    }
+
+    //TODO вынести методы для авторизации из сущности
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toList());
+    }
+
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    public boolean isEnabled() {
+        return this.isEnabled;
     }
 
     @Override
