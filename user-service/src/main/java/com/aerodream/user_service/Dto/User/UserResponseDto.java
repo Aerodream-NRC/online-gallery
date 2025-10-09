@@ -1,18 +1,12 @@
 package com.aerodream.user_service.Dto.User;
 
 import com.aerodream.user_service.Enum.RoleEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class UserResponseDto {
 
     private Long id;

@@ -1,18 +1,14 @@
 package com.aerodream.user_service.Dto.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class UserCreateDto {
 
     private String login;
 
+    @Email
     private String email;
 
     private String password;
