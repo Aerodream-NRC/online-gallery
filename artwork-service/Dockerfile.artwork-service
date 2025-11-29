@@ -1,0 +1,24 @@
+FROM gradle:8.6-jdk21 AS builder
+WORKDIR /app
+
+COPY build.gradle .
+COPY settings.gradle .
+COPY gradlew .
+COPY gradle/ gradle/
+
+COPY artwork-service/build.gradle artwork-service/
+COPY artwork-service/src/ artwork-service/src/
+
+RUN ./gradlew build -x test --no-daemon
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
+
+COPY --from=builder /app/artwork-service/build/libs/*.jar app.jar
+
+EXPOSE 8082
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
