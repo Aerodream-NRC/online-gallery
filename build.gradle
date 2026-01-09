@@ -1,12 +1,23 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.0' apply false
+    id 'org.springframework.boot' version '4.0.1' apply false
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 allprojects {
     group = 'com.aerodream'
     version = '1.0.0'
-    sourceCompatibility = '17'
+}
+
+subprojects {
+//    apply plugins: 'java.library'
+//    apply plugins: 'org.springframework.boot'
+//    apply plugins: 'io.spring.dependency-management'
+
+    java {
+        sourceCompatibility = '21'
+        targetCompatibility = '21'
+    }
 
     repositories {
         mavenCentral()
@@ -14,11 +25,11 @@ allprojects {
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+//    compileOnly 'org.projectlombok:lombok'
+//    annotationProcessor 'org.projectlombok:lombok'
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testImplementation platform('org.junit:junit-bom:5.10.0')
+//    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
