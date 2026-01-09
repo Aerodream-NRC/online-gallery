@@ -11,9 +11,11 @@ public class UserResponseDto {
 
     private Long id;
 
-    private String login;
+    private String username;
 
     private String email;
+
+    private String avatarUrl;
 
     private Set<RoleEnum> roles;
 

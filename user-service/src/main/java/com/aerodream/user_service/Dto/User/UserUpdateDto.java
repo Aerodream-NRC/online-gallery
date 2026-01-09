@@ -1,6 +1,6 @@
 package com.aerodream.user_service.Dto.User;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,17 +8,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@JsonPropertyOrder({"login", "email"})
 public class UserUpdateDto {
 
-    private Long id;
-
-    private String login;
+    private String username;
 
     private String email;
 
-    public boolean hasLogin() {
-        return login != null;
+    public boolean hasUsername() {
+        return username != null;
     }
 
     public boolean hasEmail() {

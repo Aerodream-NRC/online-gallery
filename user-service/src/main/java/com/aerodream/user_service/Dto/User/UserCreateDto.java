@@ -1,9 +1,15 @@
 package com.aerodream.user_service.Dto.User;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.Email;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@JsonPropertyOrder({"login", "email", "password", "confirmPassword"})
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserCreateDto {
 
     private String login;
@@ -14,4 +20,5 @@ public class UserCreateDto {
     private String password;
 
     private String confirmPassword;
+
 }

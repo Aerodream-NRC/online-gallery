@@ -36,12 +36,11 @@ public class ModelMapperConfig {
                 .addMappings(mapping -> {
                     mapping.map(UserCreateDto::getLogin, UserEntity::setLogin);
                     mapping.map(UserCreateDto::getEmail, UserEntity::setEmail);
-                    mapping.skip(UserEntity::setPassword);
                 });
         modelMapper.typeMap(UserEntity.class, UserResponseDto.class)
                 .addMappings(mapping -> {
                     mapping.map(UserEntity::getId, UserResponseDto::setId);
-                    mapping.map(UserEntity::getLogin, UserResponseDto::setLogin);
+                    mapping.map(UserEntity::getUsername, UserResponseDto::setUsername);
                     mapping.map(UserEntity::getEmail, UserResponseDto::setEmail);
                     mapping.map(UserEntity::getRoles, UserResponseDto::setRoles);
                     mapping.map(UserEntity::getCreatedAt, UserResponseDto::setCreatedAt);
@@ -52,9 +51,8 @@ public class ModelMapperConfig {
                 });
         modelMapper.typeMap(UserUpdateDto.class, UserEntity.class)
                 .addMappings(mapping -> {
-                    mapping.map(UserUpdateDto::getLogin, UserEntity::setLogin);
+                    mapping.map(UserUpdateDto::getUsername, UserEntity::setUsername);
                     mapping.map(UserUpdateDto::getEmail, UserEntity::setEmail);
-                    mapping.skip(UserEntity::setId);
                 });
     }
 
