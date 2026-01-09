@@ -22,9 +22,6 @@ public interface CreatorRepository extends JpaRepository<CreatorEntity, Long> {
     @Query("SELECT c FROM CreatorEntity c JOIN c.user u WHERE u.email = :email")
     Optional<CreatorEntity> findByUserEmail(@Param("email") String email);
 
-    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM CreatorEntity c WHERE c.user.id = :userId")
-    boolean isUserCreator(@Param("userId") Long userId);
-
     @Query("SELECT c, SIZE(c.subscribers) as subscriberCount FROM CreatorEntity c ORDER BY subscriberCount DESC")
     Page<Object[]> findPopularCreators(Pageable pageable);
 
