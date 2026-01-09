@@ -42,6 +42,9 @@ public class ArtworkEntity {
     )
     private Set<TagEntity> tags = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "artwork_likes", joinColumns = @JoinColumn(name = "artwork_id"))
+    @MapKeyColumn(name = "user_id")
     private Map<Long, LocalDateTime> likes = new HashMap<>();
 
     @OneToMany(
