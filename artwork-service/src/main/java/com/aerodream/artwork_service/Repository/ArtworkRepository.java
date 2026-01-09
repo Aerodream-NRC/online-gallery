@@ -21,9 +21,6 @@ public interface ArtworkRepository extends JpaRepository<ArtworkEntity, Long> {
 
     boolean existsByTitleAndCreatorId(String title, Long creatorId);
 
-    @Query("SELECT a FROM ArtworkEntity a JOIN FETCH a.creator WHERE a.id = :id")
-    Optional<ArtworkEntity> findByIdWithCreator(@Param("id") Long id);
-
     @Query("SELECT a FROM ArtworkEntity a LEFT JOIN FETCH a.comments WHERE a.id = :id")
     Optional<ArtworkEntity> findByIdWithComments(@Param("id") Long id);
 
