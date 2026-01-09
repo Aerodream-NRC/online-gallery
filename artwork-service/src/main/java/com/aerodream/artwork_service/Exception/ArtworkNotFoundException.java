@@ -1,8 +1,6 @@
 package com.aerodream.artwork_service.Exception;
 
-import jakarta.ws.rs.NotFoundException;
-
-public class ArtworkNotFoundException extends NotFoundException {
+public class ArtworkNotFoundException extends RuntimeException {
 
     public ArtworkNotFoundException(final String message) {
         super(message);

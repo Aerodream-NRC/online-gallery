@@ -1,8 +1,6 @@
 package com.aerodream.artwork_service.Exception;
 
-import jakarta.ws.rs.NotFoundException;
-
-public class CommentNotFoundException extends NotFoundException {
+public class CommentNotFoundException extends RuntimeException {
 
     public CommentNotFoundException(final String message) {
         super(message);
