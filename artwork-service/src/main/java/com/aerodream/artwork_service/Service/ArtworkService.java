@@ -3,6 +3,7 @@ package com.aerodream.artwork_service.Service;
 import com.aerodream.artwork_service.Dto.Artwork.ArtworkCreateDto;
 import com.aerodream.artwork_service.Dto.Artwork.ArtworkResponseDto;
 import com.aerodream.artwork_service.Dto.Artwork.ArtworkUpdateDto;
+import com.aerodream.artwork_service.Dto.Kafka.EventDto;
 import com.aerodream.artwork_service.Entity.ArtworkEntity;
 import com.aerodream.artwork_service.Entity.CollectionEntity;
 import com.aerodream.artwork_service.Entity.TagEntity;
@@ -11,7 +12,6 @@ import com.aerodream.artwork_service.Exception.CollectionNotFoundException;
 import com.aerodream.artwork_service.Repository.ArtworkRepository;
 import com.aerodream.artwork_service.Repository.CollectionRepository;
 import com.aerodream.artwork_service.Repository.TagRepository;
-import com.amazonaws.services.s3.AmazonS3;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
@@ -20,10 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -31,15 +30,16 @@ import java.util.UUID;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
     private final ModelMapper modelMapper;
-    private final AmazonS3 amazonS3;
+    //    private final AmazonS3 amazonS3;
     private final TagRepository tagRepository;
     private final CollectionRepository collectionRepository;
+    private final KafkaProducerService producerService;
 
     private static final String S3_BUCKET_NAME = "your-bucket-name";
 
@@ -48,10 +48,10 @@ public class ArtworkService {
 
         ArtworkEntity artwork = new ArtworkEntity();
 
-        String imageS3Key = uploadImageToS3(createDto.getImageFile());
+//        String imageS3Key = uploadImageToS3(createDto.getImageFile());
 
         modelMapper.map(artwork, createDto);
-        artwork.setImageS3Key(imageS3Key);
+//        artwork.setImageS3Key(imageS3Key);
 
         if (createDto.getTags() != null) {
             Set<TagEntity> tags = replaceTags(createDto.getTags(), artwork.getTags(), artwork);
@@ -62,6 +62,22 @@ public class ArtworkService {
 
         log.info("Artwork created with ID: {}", savedArtwork.getId());
         return convertArtworkToResponseDto(savedArtwork);
+    }
+
+    @Transactional
+    public ArtworkResponseDto userSavedArtworkToFavorite(Long artworkId) {
+        EventDto event = new EventDto(
+                UUID.randomUUID(),
+                "user_saving_artwork_to_favorite",
+                LocalDateTime.now(),
+                artworkId
+        );
+        producerService.sendMessage("artwork-service", event);
+
+        ArtworkEntity artwork = artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new ArtworkNotFoundException("Artwork not found with ID: " + artworkId));
+
+        return convertArtworkToResponseDto(artwork);
     }
 
     @Transactional(readOnly = true)
@@ -150,15 +166,15 @@ public class ArtworkService {
         return convertArtworkToResponseDto(artwork);
     }
 
-    private String uploadImageToS3(MultipartFile imageFile) throws FileUploadException {
-        try {
-            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-            amazonS3.putObject(S3_BUCKET_NAME, fileName, imageFile.getInputStream(), null);
-            return fileName;
-        } catch (IOException e) {
-            throw new FileUploadException("Failed to upload image: " + e.getMessage());
-        }
-    }
+//    private String uploadImageToS3(MultipartFile imageFile) throws FileUploadException {
+//        try {
+//            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+//            amazonS3.putObject(S3_BUCKET_NAME, fileName, imageFile.getInputStream(), null);
+//            return fileName;
+//        } catch (IOException e) {
+//            throw new FileUploadException("Failed to upload image: " + e.getMessage());
+//        }
+//    }
 
     private Set<TagEntity> replaceTags(Set<String> tagStrings, Set<TagEntity> oldTags, ArtworkEntity artwork) {
         Set<TagEntity> tags = new HashSet<>();
@@ -183,8 +199,8 @@ public class ArtworkService {
     private ArtworkResponseDto convertArtworkToResponseDto(ArtworkEntity artwork) {
         ArtworkResponseDto responseDto = modelMapper.map(artwork, ArtworkResponseDto.class);
 
-        String imageS3Key = amazonS3.getUrl(S3_BUCKET_NAME, artwork.getImageS3Key()).toString();
-        responseDto.setImageS3Key(imageS3Key);
+//        String imageS3Key = amazonS3.getUrl(S3_BUCKET_NAME, artwork.getImageS3Key()).toString();
+//        responseDto.setImageS3Key(imageS3Key);
         return responseDto;
     }
 }
