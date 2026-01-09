@@ -13,22 +13,23 @@ import com.aerodream.user_service.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.file.AccessDeniedException;
 
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class CreatorService {
 
     private final UserRepository userRepository;
     private final CreatorRepository creatorRepository;
     private final ModelMapper modelMapper;
 
-    public CreatorResponseDto makeUserCreator(CreatorCreateDto createDto) throws UserNotFoundException {
+    public CreatorResponseDto makeUserCreator(CreatorCreateDto createDto) throws AccessDeniedException {
         log.info("Making user with ID: {} creator", createDto.getUserId());
 
         UserEntity user = userRepository.findById(createDto.getUserId())
@@ -57,8 +58,8 @@ public class CreatorService {
         return convertCreatorEntityToResponseDto(creator);
     }
 
-    @Transactional(rollbackFor = {CreatorNotFoundException.class, AccessDeniedException.class})
-    public CreatorResponseDto updateCreator(CreatorUpdateDto updateDto, Long userId) throws CreatorNotFoundException {
+    @Transactional()
+    public CreatorResponseDto updateCreator(CreatorUpdateDto updateDto, Long userId) throws AccessDeniedException {
         log.info("Updating creator with ID: {}", updateDto.getId());
 
         CreatorEntity creator = creatorRepository.findById(updateDto.getId())
@@ -76,7 +77,7 @@ public class CreatorService {
     private CreatorResponseDto convertCreatorEntityToResponseDto(CreatorEntity entity) {
         CreatorResponseDto responseDto = modelMapper.map(entity, CreatorResponseDto.class);
 
-        for(UserEntity user : entity.getSubscribers()) {
+        for (UserEntity user : entity.getSubscribers()) {
             responseDto.getSubscribers().add(user.getId());
         }
 
