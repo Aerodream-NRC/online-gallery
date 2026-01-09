@@ -30,6 +30,7 @@ public class CreatorEntity {
 
     @OneToOne(mappedBy = "creator",
             fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private UserEntity user;
 
     private String firstname;
