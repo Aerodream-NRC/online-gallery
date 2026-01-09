@@ -1,2 +1,5 @@
 rootProject.name = 'online-gallery'
-
+include('api-gateway')
+include('artwork-service')
+include('user-service')
+include('image-service')

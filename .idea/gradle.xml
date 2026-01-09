@@ -9,41 +9,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/api-gateway" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/api-gateway" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/artwork-service" />
-        <option name="modules">
-          <set>
             <option value="$PROJECT_DIR$/artwork-service" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/discovery-server" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/discovery-server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/user-service" />
-        <option name="modules">
-          <set>
+            <option value="$PROJECT_DIR$/image-service" />
             <option value="$PROJECT_DIR$/user-service" />
           </set>
         </option>
       </GradleProjectSettings>
     </option>
+    <option name="offlineMode" value="true" />
   </component>
 </project>
