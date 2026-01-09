@@ -27,8 +27,7 @@ public class CollectionEntity {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator_id")
+    @Column(name = "creator_id")
     private Long creatorId;
 
     @CreationTimestamp
